@@ -1,6 +1,7 @@
-CC=g++
+CC=g++ -std=c++23
 CFLAGS=-c -Wall
-LDFLAGS=-lpthread
+LDFLAGS=-lws2_32
+
 SOURCE_DIR=src
 SOURCE_FILES=$(wildcard $(SOURCE_DIR)/*.cpp)
 OBJECTS=$(SOURCE_FILES:.cpp=.o)

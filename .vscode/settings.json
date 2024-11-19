@@ -1,0 +1,10 @@
+{
+    "makefile.makePath": "C:\\msys64\\ucrt64\\bin\\make.exe",
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "c:\\Users\\iCons\\Documents\\Code.GIT\\IRCClient\\IRCClient",
+            "binaryPath": "c:\\Users\\iCons\\Documents\\Code.GIT\\IRCClient\\IRCClient\\ircclient",
+            "binaryArgs": []
+        }
+    ]
+}

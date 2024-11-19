@@ -14,6 +14,9 @@
  */
 
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
 #include <signal.h>
 #include <cstdlib>
 #include <map>
@@ -152,23 +155,88 @@ ThreadReturn inputThread(void* client)
 #endif
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
+
+    char* host;
+    int port;
+    std::string nick;
+    std::string user;
+
     if (argc < 3)
     {
-        std::cout << "Insuficient parameters: host port [nick] [user]" << std::endl;
+    std::cout << "No command line args given: host port [nick] [user]\n";
+    std::cout << "Trying to open a configuration file \"irc.conf\"...\n";
+
+    std::fstream fileInp("irc.conf");
+    std::string lineStr;
+    std::vector<std::string> confVect;
+    if (fileInp.is_open() && !fileInp.eof()) {
+        while (getline(fileInp, lineStr)) {
+            confVect.push_back(lineStr);
+            }
+    } else {
+        std::cout << "Couldn't open configuration file!\n";
         return 1;
     }
 
-    char* host = argv[1];
-    int port = atoi(argv[2]);
-    std::string nick("MyIRCClient");
-    std::string user("IRCClient");
+    
+    struct usrConf {
+        std::string userNick;
+        std::string userName;
+    } ircUser;
 
-    if (argc >= 4)
-        nick = argv[3];
-    if (argc >= 5)
-        user = argv[4];
+    usrConf usrGlob{"aesh", "ircx"};
+
+    struct ircConf {
+        std::string ircHost;
+        int ircPort;
+        usrConf ircUser;
+    } ircNetwork;
+
+    for (int j = 0; j < (int)confVect.size(); j++) {
+        std::string confStr(confVect[j]);
+        if (confStr.starts_with("host")) {
+            ircNetwork.ircHost = confStr.substr(confStr.find('[') + 1, (confStr.find(']') - confStr.find('[')) - 1 );
+        } else if (confStr.starts_with("port")) {
+            ircNetwork.ircPort = stoi(confStr.substr(confStr.find('[') + 1, (confStr.find(']') - confStr.find('[')) - 1));
+        } else if (confStr.starts_with("user")) {
+            ircUser.userName = confStr.substr(confStr.find('[') + 1, (confStr.find(']') - confStr.find('[')) - 1);
+        } else if (confStr.starts_with("nick")) {
+            ircUser.userNick = confStr.substr(confStr.find('[') + 1, (confStr.find(']') - confStr.find('[')) - 1);
+        }
+    }
+    host = (char*)ircNetwork.ircHost.c_str();
+    port = ircNetwork.ircPort;
+    user = ircUser.userName;
+    nick = ircUser.userNick;
+    }
+    else
+    {
+        host = argv[1];
+        port = atoi(argv[2]);
+        nick = "MyIRCClient";
+        user = "IRCClient";
+
+        if (argc >= 4)
+            nick = argv[3];
+        if (argc >= 5)
+            user = argv[4];
+    }
+
+    std::cout << "IRC client will run with following parameters:" << std::endl;
+    std::cout << "IRC server host: " << host << std::endl;
+    std::cout << "IRC server port: " << port << std::endl;
+    std::cout << "IRC user ident : " << user << std::endl;
+    std::cout << "IRC user nick  : " << nick << std::endl;
+    std::cout << "Is this correct? y/n:";
+    char runClient;
+    std::cin >> runClient;
+    if (runClient == 'y') {
+        std::cout << "Starting IRC client\n";
+    } else {
+        std::cout << "Program will close" << std::endl;
+        return 0;
+    }
 
     IRCClient client;
 
