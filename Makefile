@@ -1,4 +1,5 @@
-CC=g++
+CC=g++ -std=c++23
+CXXFLAGS= -std=c++23
 CFLAGS=-c -Wall
 LDFLAGS=-lpthread
 SOURCE_DIR=src
