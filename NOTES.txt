@@ -1,0 +1,26 @@
+With password:
+
+NICK aion
+USER xion@telnet/rusnet:lamodrom 8 * :C++ IRC Client
+PASS xion@telnet/rusnet:lamodrom
+
+NICK aion
+PASS xion@telnet/rusnet:lamodrom
+USER xion@telnet/rusnet:lamodrom 8 * :C++ IRC Client
+
+With no password:
+
+USER xion@telnet/rusnet
+USER xion@telnet/rusnet 8 * :C++ IRC Client
+
+
+
+Connect with CLI args:
+
+./ircxx host port nick user password auto // if auto provided, client connects with no connection parameters confirmation
+
+./ircxx 45.155.205.106 7788 aion xion@ircxx/rusnet lamodrom auto // connects to host (ZNC) with nick aion, ident xion, identifier ircxx, password lamodrom, no confirmation (auto)
+
+./ircxx irc.rizon.net 7000 zima xion nopass auto // connects automatically with no confirmation
+
+./ircxx irc.rizon.net 7000 zima xion // connects with confirmation, nick=zima, ident=xion

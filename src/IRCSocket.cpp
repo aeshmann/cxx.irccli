@@ -17,7 +17,7 @@
 #include <fcntl.h>
 #include "IRCSocket.h"
 
-#define MAXDATASIZE 4096
+#define MAXDATASIZE 16384
 
 bool IRCSocket::Init()
 {

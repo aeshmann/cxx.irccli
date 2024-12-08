@@ -10,6 +10,33 @@ Windows | Linux | Azure (Linux/macOS)
   receiving an IRC command.
 - Example in Main.cpp
 
+### Connecting to IRC:
+There are two ways to connect:
+1) with commanl line arguments:
+    ./ircxx host port nick user password auto // if auto provided, client connects with no connection parameters confirmation
+
+    ./ircxx your.znc.host 7755 your_nick your_username@ZNC_client_identfier/ZNC_Network_name ZNC_password auto // connects to host (ZNC) with nick aion, ident xion, identifier ircxx, password lamodrom, no confirmation (auto)
+
+    ./ircxx irc.rizon.net 7000 zima xion nopass auto // connects automatically with nick zima, username xion, no confirmation
+
+    ./ircxx irc.rizon.net 7000 zima xion // connects with confirmation, nick=zima, ident=xion, asks confirmation to connect
+
+    #### Not public samples:
+           
+        ./ircxx host port nick user password auto // if auto provided, client connects with no connection parameters confirmation
+
+        ./ircxx 45.155.205.106 7788 aion xion@ircxx/rusnet -password- auto // connects to host (ZNC) with nick aion, ident xion, identifier ircxx, password -password-, no confirmation (auto)
+
+        ./ircxx irc.rizon.net 7000 zima xion nopass auto // connects automatically with no confirmation
+
+        ./ircxx irc.rizon.net 7000 zima xion // connects with confirmation, nick=zima, ident=xion
+
+2) with connection parameters, read from irc.conf file
+
+    Config file should be named irc.conf. Config file samples are licated in set/ folder.
+
+
+
 ### Hooking IRC commands:
 First create a function (name it whatever you want) with two arguments, an IRCMessage and a pointer to IRCClient:
 

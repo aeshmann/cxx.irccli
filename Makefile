@@ -6,7 +6,7 @@ SOURCE_DIR=src
 SOURCE_FILES=$(wildcard $(SOURCE_DIR)/*.cpp)
 OBJECTS=$(SOURCE_FILES:.cpp=.o)
 BUILD_DIR=bin
-EXECUTABLE=ircclient
+EXECUTABLE=ircxx
 
 all: $(SOURCE_FILES) $(EXECUTABLE)
 	

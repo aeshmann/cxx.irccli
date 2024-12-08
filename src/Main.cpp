@@ -131,19 +131,25 @@ ThreadReturn inputThread(void* client)
     commandHandler.AddCommand("part", 1, &partCommand);
     commandHandler.AddCommand("ctcp", 2, &ctcpCommand);
 
-    while(true)
+    while (true)
     {
         getline(std::cin, command);
         if (command == "")
             continue;
 
         if (command[0] == '/')
-            commandHandler.ParseCommand(command, (IRCClient*)client);
-        else
-            ((IRCClient*)client)->SendIRC(command);
-
-        if (command == "quit")
+        {
+            commandHandler.ParseCommand(command, (IRCClient *)client);
+        }
+        else if (command == "quit")
+        {
+            std::cout << "Disconnecting\n";
             break;
+        }
+        else
+        {
+            ((IRCClient *)client)->SendIRC(command);
+        }
     }
 
 #ifdef _WIN32
@@ -157,30 +163,16 @@ int main(int argc, char* argv[]) {
 
     char* host;
     int port;
-    std::string nick;
-    std::string user;
+    std::string nick("");
+    std::string user("");
+    std::string pass("");
+    std::string confCHeck("");
 
-    if (argc < 3)
-    {
-    std::cout << "No command line args given: host port [nick] [user]\n";
-    std::cout << "Trying to open a configuration file \"irc.conf\"...\n";
-
-    std::fstream fileInp("irc.conf");
-    std::string lineStr;
-    std::vector<std::string> confVect;
-    if (fileInp.is_open() && !fileInp.eof()) {
-        while (getline(fileInp, lineStr)) {
-            confVect.push_back(lineStr);
-            }
-    } else {
-        std::cout << "Couldn't open configuration file!\n";
-        return 1;
-    }
-
-    
+        
     struct usrConf {
         std::string userNick;
         std::string userName;
+        std::string userPass;
     } ircUser;
 
     usrConf usrGlob{"aesh", "ircx"};
@@ -188,8 +180,26 @@ int main(int argc, char* argv[]) {
     struct ircConf {
         std::string ircHost;
         int ircPort;
+        bool runAuto; // if true - connects without confirmation
         usrConf ircUser;
     } ircNetwork;
+
+    if (argc < 3)
+    {
+    std::cout << "No command line args given: host port [nick] [user]\n";
+    std::cout << "Trying to open a configuration file \"irc.conf\"...\n";
+
+    std::fstream fileConf("irc.conf");
+    std::string lineStr;
+    std::vector<std::string> confVect;
+    if (fileConf.is_open() && !fileConf.eof()) {
+        while (getline(fileConf, lineStr)) {
+            confVect.push_back(lineStr);
+            }
+    } else {
+        std::cout << "Couldn't open configuration file!\n";
+        return 1;
+    }
 
     for (int j = 0; j < (int)confVect.size(); j++) {
         std::string confStr(confVect[j]);
@@ -199,41 +209,67 @@ int main(int argc, char* argv[]) {
             ircNetwork.ircPort = stoi(confStr.substr(confStr.find('[') + 1, (confStr.find(']') - confStr.find('[')) - 1));
         } else if (confStr.starts_with("user")) {
             ircUser.userName = confStr.substr(confStr.find('[') + 1, (confStr.find(']') - confStr.find('[')) - 1);
+        } else if (confStr.starts_with("pass")) {
+            ircUser.userPass = confStr.substr(confStr.find('[') + 1, (confStr.find(']') - confStr.find('[')) - 1);
         } else if (confStr.starts_with("nick")) {
             ircUser.userNick = confStr.substr(confStr.find('[') + 1, (confStr.find(']') - confStr.find('[')) - 1);
+        } else if (confStr.starts_with("auto")) {
+            std::string autoRunState = confStr.substr(confStr.find('[') + 1, (confStr.find(']') - confStr.find('[')) - 1);
+            if (autoRunState == "true" ) {
+                ircNetwork.runAuto = true;
+            } else {
+                ircNetwork.runAuto = false;
+            }
         }
     }
     host = (char*)ircNetwork.ircHost.c_str();
     port = ircNetwork.ircPort;
     user = ircUser.userName;
     nick = ircUser.userNick;
+    pass = ircUser.userPass;
     }
     else
     {
         host = argv[1];
         port = atoi(argv[2]);
-        nick = "MyIRCClient";
-        user = "IRCClient";
+        nick = "aion";
+        user = "ircx";
 
         if (argc >= 4)
             nick = argv[3];
         if (argc >= 5)
             user = argv[4];
+        if (argc >= 6)
+            pass = argv[5];
+        if (argc >= 7) {
+            confCHeck = argv[6];
+        }
+            if (confCHeck == "auto") {
+                ircNetwork.runAuto = true;
+            }
+           
     }
 
-    std::cout << "IRC client will run with following parameters:" << std::endl;
-    std::cout << "IRC server host: " << host << std::endl;
-    std::cout << "IRC server port: " << port << std::endl;
-    std::cout << "IRC user ident : " << user << std::endl;
-    std::cout << "IRC user nick  : " << nick << std::endl;
-    std::cout << "Is this correct? y/n:";
-    char runClient;
-    std::cin >> runClient;
-    if (runClient == 'y') {
-        std::cout << "Starting IRC client\n";
-    } else {
-        std::cout << "Program will close" << std::endl;
-        return 0;
+    if (!ircNetwork.runAuto)
+    {
+        std::cout << "IRC client will run with following parameters:" << std::endl;
+        std::cout << "IRC server host:\t" << host << std::endl;
+        std::cout << "IRC server port:\t" << port << std::endl;
+        std::cout << "IRC user ident :\t" << user << std::endl;
+        std::cout << "IRC server pass:\t" << pass << std::endl;
+        std::cout << "IRC user nick  :\t" << nick << std::endl;
+        std::cout << "Is this correct? y/n:";
+        char runClient;
+        std::cin >> runClient;
+        if (runClient == 'y')
+        {
+            std::cout << "Starting IRC client\n";
+        }
+        else
+        {
+            std::cout << "Program will close" << std::endl;
+            return 0;
+        }
     }
 
     IRCClient client;
@@ -252,7 +288,7 @@ int main(int argc, char* argv[]) {
         {
             std::cout << "Connected. Loggin in..." << std::endl;
 
-            if (client.Login(nick, user))
+            if (client.Login(nick, user, pass))
             {
                 std::cout << "Logged." << std::endl;
 
