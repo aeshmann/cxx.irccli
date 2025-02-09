@@ -21,15 +21,6 @@ There are two ways to connect:
 
     ./ircxx irc.rizon.net 7000 zima xion // connects with confirmation, nick=zima, ident=xion, asks confirmation to connect
 
-    #### Not public samples:
-           
-        ./ircxx host port nick user password auto // if auto provided, client connects with no connection parameters confirmation
-
-        ./ircxx 45.155.205.106 7788 aion xion@ircxx/rusnet -password- auto // connects to host (ZNC) with nick aion, ident xion, identifier ircxx, password -password-, no confirmation (auto)
-
-        ./ircxx irc.rizon.net 7000 zima xion nopass auto // connects automatically with no confirmation
-
-        ./ircxx irc.rizon.net 7000 zima xion // connects with confirmation, nick=zima, ident=xion
 
 2) with connection parameters, read from irc.conf file
 
